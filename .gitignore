@@ -1,0 +1,15 @@
+/wandb
+.DS_Store
+.ipynb_checkpoints/
+/slurm_logs
+__pycache__/
+*.pyc
+uv.lock
+./envs/__pycache__/*
+*.venv/
+.venv/
+/runs/*
+runs/
+*.pkl
+*.buffer.pkl
+*.zip
