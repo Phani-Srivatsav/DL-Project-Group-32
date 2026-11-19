@@ -1,0 +1,13 @@
+jax[cuda12]>=0.4.23; platform_system == 'Linux'
+jax>=0.4.23; platform_system != 'Linux'
+flax>=0.7.4
+optax>=0.1.7
+brax>=0.10.1
+mujoco>=3.2.0
+mediapy>=1.2.2
+scipy>=1.12.0
+numpy>=1.26.0,<2.0.0
+tyro>=0.8.0
+matplotlib>=3.8.0
+pandas>=2.1.0
+wandb>=0.17.0

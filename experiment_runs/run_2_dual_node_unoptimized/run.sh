@@ -1,15 +1,8 @@
-#!/bin/bash
-#SBATCH --job-name=dual_node_s4
-#SBATCH --partition=rtx
-#SBATCH --account=courses
-#SBATCH --qos=course
-#SBATCH --gres=gpu:1
-#SBATCH --cpus-per-task=12
-#SBATCH --time=12:00:00
-#SBATCH --output=slurm-%j.out
-#SBATCH --error=slurm-%j.err
+#!/usr/bin/env bash
+# Run 2: Dual NODE Unoptimized (Euler solver, s=4)
+export XLA_PYTHON_CLIENT_PREALLOCATE=false
 
-.venv/bin/python -u train_dual_node.py \
+python -u train_dual_node.py \
   --env-id ant_u4_maze \
   --eval-env-id ant_u4_maze_eval \
   --critic-type node \

@@ -1,7 +1,8 @@
 #!/bin/bash
 # ==============================================================================
-# Turnkey Setup Script for New HPC Slurm Accounts
-# Sets up uv, Python 3.10 virtual environment, JAX with CUDA 12, and dependencies
+# Turnkey Environment Setup for GPU Systems (Linux / WSL / Cloud / Cluster)
+# Automatically sets up uv, Python 3.10 virtual environment, JAX with CUDA 12,
+# Brax, MuJoCo, and dependencies.
 # ==============================================================================
 
 set -e
@@ -72,7 +73,9 @@ EOF
 fi
 
 echo "=== ENVIRONMENT SETUP COMPLETE ==="
-echo "You can now launch training with:"
-echo "  sbatch run_ant_big_maze.slurm"
-echo "  # or"
-echo "  sbatch run_arm_push_hard.slurm"
+echo "You can now run any training script:"
+echo "  python train_dual_node_breakthrough.py --env-id ant_u4_maze"
+echo "  # or use convenience runners:"
+echo "  bash scripts/train_ant_u4.sh"
+echo "  bash scripts/train_ant_big_maze.sh"
+echo "  bash scripts/train_arm_push.sh"

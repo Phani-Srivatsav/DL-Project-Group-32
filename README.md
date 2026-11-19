@@ -37,24 +37,23 @@ $$a^* = \arg\max_{a^{(k)}} Q_\theta(s, a^{(k)}, g)$$
 
 ---
 
-## 3. Experimental Runs & Results Hierarchy
+## 3. Repository Architecture & Experimental Runs
 
-All experimental runs, metrics, and logs are organized in [`experiment_runs/`](experiment_runs/):
+All experiment runs, standalone code, metrics, and interactive visualizations are organized in [`experiment_runs/`](experiment_runs/):
 
 ```text
 ├── experiment_runs/
-│   ├── run_1_single_node_baseline/        # NODE Critic + ResNet-4 Actor (Capacity mismatch diagnosis)
+│   ├── run_1_single_node_baseline/        # NODE Critic + ResNet-4 Actor (Diagnosis of capacity mismatch)
 │   ├── run_2_dual_node_unoptimized/       # Symmetrical NODE v1 (3-corridor maze traversal in vis.html)
-│   ├── run_3_dual_node_optimized_s8/      # Peak 26.14 (Surpassed paper's Depth-4 peak ~18.0)
-│   └── run_4_breakthrough_dual_node_s16/  # Scaled W512, S16 (NFE=64) continuous flow (81M+ steps)
+│   ├── run_3_dual_node_optimized_s8/      # Peak 26.14 (Surpassed paper's ResNet-4 peak of ~18.0)
+│   └── run_4_breakthrough_dual_node_s16/  # Scaled W512, S16 (NFE=64) continuous flow (82M+ steps)
+├── scripts/                               # Universal GPU execution scripts (Ant U-Maze, Big Maze, Arm Push)
 ├── results_data/                          # Official NeurIPS 2025 raw benchmark datasets
 ├── envs/                                  # Full MuJoCo / Brax environment suite
 ├── train_dual_node_breakthrough.py        # Universal Neural ODE Training Engine
 ├── generate_publication_report.py         # Automated Paper-Style Figure & Table Generator
-├── run_dual_node_breakthrough.slurm       # Slurm script for Ant U4 Maze
-├── run_ant_big_maze.slurm                 # Slurm script for Ant Big Maze
-├── run_arm_push_hard.slurm                # Slurm script for 7-DOF Arm Push
-└── setup_account.sh                       # 1-line turnkey HPC installer
+├── requirements.txt                       # Standard Python dependencies
+└── setup.sh                               # 1-command environment installer (uv / JAX CUDA 12)
 ```
 
 ---
@@ -69,33 +68,75 @@ All experimental runs, metrics, and logs are organized in [`experiment_runs/`](e
 | **ResNet-32** *(Paper)* | Discrete | 32 | ~2.20M | 257.71 | High Capacity |
 | **ResNet-64** *(Paper)* | Discrete | 64 | ~4.30M | 296.32 | Heavy Memory Footprint |
 | **Run 3 (Dual NODE, $s=8$)** | Continuous | 32 | ~0.59M | **26.14** | **Broke ResNet-4 Peak** |
-| **Run 4 (Breakthrough, $s=16$)** | **Continuous** | **64** | **~2.48M** | **Active (81M+ steps)** | **42% Leaner than ResNet-64** |
+| **Run 4 (Breakthrough, $s=16$)** | **Continuous** | **64** | **~2.48M** | **Active (82M+ steps)** | **42% Leaner than ResNet-64** |
 
 ---
 
-## 5. Quickstart & Reproducibility
+## 5. Universal Quickstart & Reproducibility
+
+This repository is designed to run on **any machine with an NVIDIA GPU** (local desktop, workstation, cloud VM like Lambda/RunPod, or cluster).
+
+### Hardware Requirements
+- **GPU:** 1x NVIDIA GPU with 8GB+ VRAM (RTX 3070/3080/4080/4090, A100, H100, etc.)
+- **OS:** Linux (Ubuntu 20.04/22.04/24.04, Debian) or Windows WSL2
+- **Python:** 3.10+
 
 ### Installation
+
 ```bash
+# Clone the repository
 git clone https://github.com/Phani-Srivatsav/DL-Project-Group-32.git
 cd DL-Project-Group-32
-bash setup_account.sh
+
+# Option A: 1-Command Automated Setup (Recommended)
+bash setup.sh
+
+# Option B: Standard pip installation
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
-### Launch Training on Slurm Cluster
+### Launch Training on Any GPU
+
+Run directly via universal shell scripts:
 ```bash
-# Ant U4 Maze (Breakthrough Dual Neural ODE)
-sbatch run_dual_node_breakthrough.slurm
+# 1. Ant U4 Maze (Breakthrough Dual Neural ODE)
+bash scripts/train_ant_u4.sh
 
-# Ant Big Maze (NeurIPS Section 4 Flagship Maze)
-sbatch run_ant_big_maze.slurm
+# 2. Ant Big Maze (NeurIPS Section 4 Flagship Maze)
+bash scripts/train_ant_big_maze.sh
 
-# Arm Push Hard (7-DOF Robotic Manipulation)
-sbatch run_arm_push_hard.slurm
+# 3. Arm Push Hard (7-DOF Robotic Manipulation)
+bash scripts/train_arm_push.sh
+```
+
+Or execute directly with custom CLI hyperparameters:
+```bash
+python train_dual_node_breakthrough.py \
+  --env-id ant_u4_maze \
+  --eval-env-id ant_u4_maze_eval \
+  --critic-type node \
+  --actor-type node \
+  --ode-solver rk4 \
+  --ode-steps 16 \
+  --actor-network-width 512 \
+  --critic-network-width 512 \
+  --num-epochs 100 \
+  --total-env-steps 100000000
+```
+
+*(Note for HPC / Slurm Cluster Users: A generic cluster batch template is available at `scripts/hpc_template.slurm`.)*
+
+### Reproducing Previous Runs
+Each experiment in `experiment_runs/` can be reproduced independently:
+```bash
+cd experiment_runs/run_3_dual_node_optimized_s8
+bash run.sh
 ```
 
 ### Generate Publication Reports & Figures
 ```bash
 python generate_publication_report.py --run-dir experiment_runs/run_4_breakthrough_dual_node_s16
 ```
-Outputs `publication_report.png`, `publication_report.pdf`, and `publication_table.md`.
+Generates `publication_report.png`, `publication_report.pdf`, and `publication_table.md`.

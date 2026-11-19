@@ -13,3 +13,10 @@ runs/
 *.pkl
 *.buffer.pkl
 *.zip
+
+# Slurm HPC batch files (cluster specific)
+*.slurm
+experiment_runs/*/*.slurm
+!scripts/hpc_template.slurm
+slurm-*.out
+slurm-*.err
