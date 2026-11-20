@@ -1,21 +1,50 @@
-# Experimental Runs & Results Directory
+# Multi-Environment Experimental Directory
 
-Each folder in this directory is fully self-contained, including the exact Python model and training code, universal GPU execution runner (`run.sh`), evaluation module, replay buffer, metrics log (`metrics.csv`), interactive trajectory visualizations (`vis.html`), and comprehensive post-run diagnostic reports.
+This directory organizes all experimental runs, model checkpoints, training logs, and evaluations by environment. Each environment folder contains self-contained runs with standalone execution code, metrics, and visualization artifacts.
 
-| Run Directory | Architecture | Key Characteristics | Exact Code & Scripts | Model Weights & Results | Outcome / Status |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **[`run_1_single_node_baseline`](run_1_single_node_baseline/)** | NODE Critic + ResNet-4 Actor | $s=4$, NFE=16, Width 256 | `train_node.py`<br>`run.sh`<br>`run_node_100m.slurm` | `latest_ckpt.pkl`<br>`metrics.csv`<br>`vis.html` | Capacity mismatch; policy underfitted ($0.0$ score) |
-| **[`run_2_dual_node_unoptimized`](run_2_dual_node_unoptimized/)** | Dual NODE v1 (Actor + Critic) | Euler solver, $s=4$, Width 256 | `train_dual_node.py`<br>`run.sh`<br>`run_dual_node_euler_s4.slurm` | `latest_ckpt.pkl`<br>`metrics.csv`<br>`vis.html` | Reached 3 corridors ($14.5\text{m} \to 3.5\text{m}$); Brax metric cutoff identified |
-| **[`run_3_dual_node_optimized_s8`](run_3_dual_node_optimized_s8/)** | Dual NODE v2 (Optimized) | RK4 solver, $s=8$, NFE=32, Width 512 | `train_dual_node.py`<br>`run.sh`<br>`run_dual_node_rk4_s8.slurm` | `latest_ckpt.pkl`<br>`metrics.csv` (100M)<br>`vis.html` | **Peak 26.14**, 100M Score **20.59** (Doubled ResNet-4 paper peak of ~13.66) |
-| **[`run_4_breakthrough_dual_node_s16`](run_4_breakthrough_dual_node_s16/)** | Scaled Breakthrough Dual NODE | RK4 solver, $s=16$, NFE=64, Width 512 | `train_dual_node_breakthrough.py`<br>`run.sh`<br>`run_dual_node_breakthrough.slurm` | `latest_ckpt.pkl` (125M)<br>`metrics.csv`<br>`vis.html`<br>`re_evaluation_report.md` | **Final Score 269.34** (Surpassed ResNet-32: 257.71; 42% leaner than ResNet-64) |
+---
 
-## How to Run Any Experiment
-To reproduce any run on any workstation or server equipped with an NVIDIA GPU:
-```bash
-cd experiment_runs/run_4_breakthrough_dual_node_s16
-bash run.sh
+## Benchmark Environments
+
+### 1. [`ant_u4_maze`](ant_u4_maze/)
+**Goal-Conditioned Locomotion in 4-Corridor Maze (Brax / Spring Physics)**
+- **Baseline Runs:** Single-Node Baseline (`run_1`), Dual-Node Unoptimized (`run_2`), Dual-Node RK4-S8 (`run_3`).
+- **Breakthrough Model:** Dual Continuous-Depth Neural ODE with RK4 solver, $s=16$, Width 512, 125M environment steps (`run_4`).
+- **Key Findings:**
+  - `u4_maze` (10 corridor goals): Peak score **296.69** (Time-at-Goal) with **52.34%** success, matching ResNet-64 (296.32) with 42% fewer parameters.
+  - `u4_maze_eval` (held-out far corridor): Run 3 reached **20.59** (23.4% success).
+- Full details in [`ant_u4_maze/README.md`](ant_u4_maze/README.md).
+
+---
+
+### 2. [`ant_big_maze`](ant_big_maze/)
+**High-Complexity Spatial Navigation (Brax / Spring Physics)**
+- Scaled maze topology testing long-horizon temporal feature learning.
+- Runner script: [`scripts/train_ant_big_maze.sh`](../scripts/train_ant_big_maze.sh).
+- Maintained by: Dhruv.
+
+---
+
+### 3. [`arm_push_hard`](arm_push_hard/)
+**Robotic Manipulation & Physics Interaction (Brax / MJX Physics)**
+- 7-DOF robotic arm manipulation testing contact physics and multi-body dynamics.
+- Runner script: [`scripts/train_arm_push.sh`](../scripts/train_arm_push.sh).
+- Maintained by: Aarav.
+
+---
+
+## Directory Structure
 ```
-Or run the Python script directly with your custom arguments:
-```bash
-python train_dual_node_breakthrough.py --env-id ant_u4_maze --ode-steps 16
+experiment_runs/
+├── ant_u4_maze/
+│   ├── run_1_single_node_baseline/
+│   ├── run_2_dual_node_unoptimized/
+│   ├── run_3_dual_node_optimized_s8/
+│   ├── run_4_breakthrough_dual_node_s16/
+│   └── README.md
+├── ant_big_maze/
+│   └── README.md
+├── arm_push_hard/
+│   └── README.md
+└── README.md
 ```
