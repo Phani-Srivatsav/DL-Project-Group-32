@@ -98,7 +98,7 @@ class Args:
     use_all_batches: int = 0
     num_sgd_batches_per_training_step: int = 800
 
-    eval_actor: int = 10  # 10: Test-time contrastive search guided by Neural ODE critic
+    eval_actor: int = 1  # 10: Test-time contrastive search guided by Neural ODE critic
     expl_actor: int = 1
     entropy_param: float = 0.5
     disable_entropy: int = 0

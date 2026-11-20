@@ -14,7 +14,7 @@ python -u train_dual_node_breakthrough.py \
   --actor-network-width 512 \
   --critic-network-width 512 \
   --ode-num-layers 3 \
-  --eval-actor 10 \
+  --eval-actor 1 \
   --gamma 0.995 \
   --episode-length 80 \
   --unroll-length 80 \
