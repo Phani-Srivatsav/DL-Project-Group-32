@@ -8,7 +8,7 @@
 | **ResNet-16** | Discrete | 16 | ~1.40M | 145.01 | — | — |
 | **ResNet-32** | Discrete | 32 | ~2.20M | 257.71 | — | — |
 | **ResNet-64** | Discrete | 64 | ~4.30M | 296.32 | — | — |
-| **Dual Neural ODE (Ours)** | **Continuous Flow** | **64** | **~2.48M** | **269.34** | **259.18 ± 6.50** | **48.4%** |
+| **Dual Neural ODE (Ours)** | **Continuous Flow** | **64** | **~2.48M** | **296.69** | **290.71 ± 4.03** | **52.3%** |
 
 ### Key Scientific Takeaways for Project Presentation:
 1. **Critical Depth Phenomenon:** Just as demonstrated in the NeurIPS paper, shallow models fail to navigate maze bottlenecks or complex object coordinates. Continuous flows provide the necessary temporal-feature depth.
