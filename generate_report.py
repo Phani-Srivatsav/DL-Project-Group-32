@@ -127,7 +127,7 @@ def generate():
 
 ## Key Findings:
 1. **Primary Metric (Time at Goal):** Measures number of steps out of 1000 where the ant remains within target goal distance (< 0.5) inside the maze.
-2. **Computational Trade-off:** Dual Neural ODE uses continuous vector field integration with RK4 (s=16, NFE=64), achieving 296.69 Time at Goal with 42% fewer parameters than ResNet Depth-64.
+2. **Computational Trade-off:** Dual Neural ODE uses continuous vector field integration with RK4 (s=16, NFE=64), achieving 269.34 Time at Goal with 42% fewer parameters than ResNet Depth-64.
 3. **Artifacts Generated:**
    - 3D Simulation Replay: `vis.html`
    - High-Res Analytics Dashboard: `comparison_report.png`

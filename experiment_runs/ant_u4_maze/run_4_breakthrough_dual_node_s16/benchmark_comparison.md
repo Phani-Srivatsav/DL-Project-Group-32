@@ -5,12 +5,12 @@
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
 | **ResNet Depth-4** *(Baseline)* | Discrete Residual | 4 | ~408k | 13.66 | 13.66 | ~15.0% | 1.98 h (A100) |
 | **ResNet Depth-32** *(Paper)* | Discrete Residual | 32 | ~2.2M | 257.71 | 257.71 | ~42.0% | 6.50 h (A100) |
-| **Dual Neural ODE** *(Ours, s=16)* | **Continuous-Depth (RK4)** | **64** | **~2.48M** | **290.71 ± 4.03** | **296.69** | **51.7%** | **3.90 h** |
+| **Dual Neural ODE** *(Ours, s=16)* | **Continuous-Depth (RK4)** | **64** | **~2.48M** | **259.18 ± 6.50** | **269.34** | **47.4%** | **3.90 h** |
 | **ResNet Depth-64** *(Paper Peak)* | Discrete Residual | 64 | ~4.3M | 296.32 | 296.32 | ~85.0% | 11.43 h (A100) |
 
 ## Key Findings:
 1. **Primary Metric (Time at Goal):** Measures number of steps out of 1000 where the ant remains within target goal distance (< 0.5) inside the maze.
-2. **Computational Trade-off:** Dual Neural ODE uses continuous vector field integration with RK4 (s=16, NFE=64), achieving 296.69 Time at Goal with 42% fewer parameters than ResNet Depth-64.
+2. **Computational Trade-off:** Dual Neural ODE uses continuous vector field integration with RK4 (s=16, NFE=64), achieving 269.34 Time at Goal with 42% fewer parameters than ResNet Depth-64.
 3. **Artifacts Generated:**
    - 3D Simulation Replay: `vis.html`
    - High-Res Analytics Dashboard: `comparison_report.png`
