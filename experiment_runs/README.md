@@ -41,6 +41,7 @@ experiment_runs/
 │   ├── run_2_dual_node_unoptimized/
 │   ├── run_3_dual_node_optimized_s8/
 │   ├── run_4_breakthrough_dual_node_s16/
+│   ├── run_5_tuned_s24/
 │   └── README.md
 ├── ant_big_maze/
 │   └── README.md
