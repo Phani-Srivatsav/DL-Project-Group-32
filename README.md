@@ -1,6 +1,8 @@
 # Continuous-Depth Neural ODEs for Goal-Conditioned Reinforcement Learning
 **Benchmarking Continuous Dynamical Flows Against Deep ResNet Architectures (NeurIPS 2025)**
 
+> 📄 **Master Project Overview & Comprehensive Guide:** See [**`PROJECT_OVERVIEW.md`**](PROJECT_OVERVIEW.md) for the complete breakdown of objectives, author context, research gaps, methodology, and full experimental results across all environments (`ant_u4_maze`, `ant_big_maze`, and `arm_push_hard`).
+
 ---
 
 ## 1. Project Overview & Motivation
