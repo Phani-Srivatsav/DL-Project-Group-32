@@ -28,26 +28,34 @@ The NeurIPS 2025 paper (*"1000 Layer Networks for Self-Supervised RL"*) challeng
 
 ---
 
-## 3. The Gap Identified in the Original Paper
+## 3. The Gap Mentioned by the Authors
 
-While the authors demonstrated that scaling discrete residual depth unlocks dramatic capabilities, their approach revealed several fundamental limitations:
-1. **Parameter Bloat:** In discrete ResNets, each added block introduces a completely new set of weights. ResNet-64 requires **~4.3 Million parameters**, ResNet-128 requires **~8.5 Million parameters**, and 1,000 layers require tens of millions of parameters. This creates massive memory footprints and slow inference on edge robotic hardware.
-2. **Rigid Depth Discretization:** A discrete ResNet has a fixed architecture. A 64-layer network cannot dynamically evaluate with higher precision around sharp obstacles or lower precision along open straight corridors.
-3. **Discrete vs. Continuous Dynamics Mismatch:** Physical systems (quadruped ants, robotic arms) evolve continuously according to ordinary differential equations governed by Newtonian physics. Discrete residual hops ($h_{k+1} = h_k + f(h_k)$) represent a crude Euler approximation of continuous dynamics, which struggles to maintain numerical stability near high-friction contact boundaries.
-4. **Optimization Fragility:** Backpropagating through hundreds of discrete layers required delicate normalization techniques (LayerNorm, zero-initialized residuals, SkipInit) to avoid representation collapse.
+In the NeurIPS 2025 paper (*"1000 Layer Networks for Self-Supervised RL"*), the authors demonstrated that scaling depth up to 1,024 layers unlocks dramatic qualitative capabilities in self-supervised RL. 
+
+Crucially, the authors explicitly noted the mathematical connection between discrete residual connections and continuous dynamical systems: a discrete residual block update:
+$$h_{k+1} = h_k + f(h_k)$$
+is formally equivalent to a forward Euler discretization of an Ordinary Differential Equation (ODE):
+$$h(t + \Delta t) = h(t) + f(h(t), t)\Delta t \implies \frac{dh(t)}{dt} = f(h(t), t)$$
+
+**The authors explicitly highlighted that Neural ODEs can model network depth in the same way ResNets model depth.**
+
+However, the authors **left this entirely as an open gap**:
+1. **Unverified Hypothesis:** The authors noted that Neural ODEs could conceptually represent continuous depth, but they **never implemented or empirically tested Neural ODEs** on their benchmarks—they exclusively experimented with discrete ResNets.
+2. **Untested Feasibility:** They did not investigate whether continuous-depth ODEs could be trained stably with self-supervised contrastive objectives (InfoNCE), whether numerical solver drift would accumulate over long trajectory rollouts, or what ODE solvers would be needed in practice.
+3. **Unvalidated Parameter Efficiency:** While the authors showed that discrete ResNets scale successfully, each discrete layer incurs linear parameter bloat (ResNet-64 requires ~4.3M parameters). Whether continuous-depth Neural ODEs could achieve equivalent high-depth representation capacity with a fraction of the parameters was left as an unanswered research question.
 
 ---
 
 ## 4. The Gap We Are Solving
 
-We address the core question:
-> **Can we obtain the spatial reasoning and representational capacity of a 64-to-128-layer network without the parameter explosion and discrete step constraints of ResNets?**
+We directly take on the **unaddressed gap explicitly stated by the authors**:
+> **Can we turn the author's theoretical observation into an empirical reality, proving that Continuous-Depth Neural ODEs can match or outperform deep discrete ResNets in self-supervised GCRL, while solving the practical engineering hurdles the authors left unexplored?**
 
-We bridge this gap by replacing discrete residual layers with **Continuous-Depth Neural ODEs**:
-$$\frac{dh(t)}{dt} = f_\theta(h(t), t), \quad t \in [0, 1]$$
-$$\text{Output } h(1) = h(0) + \int_0^1 f_\theta(h(t), t) \, dt$$
-
-Instead of stacking 64 distinct discrete neural network layers, we learn a single, parameter-efficient continuous vector field $f_\theta$ and integrate it forward in time using numerical ODE solvers (such as 4th-Order Runge-Kutta, RK4).
+Specifically, our work resolves the following unanswered questions:
+1. **Empirical Validation of Continuous Depth:** We implement, train, and benchmark continuous-depth Neural ODEs on the author's exact tasks (`ant_u4_maze`, `ant_big_maze`, and `arm_push_hard`), proving that continuous flows can indeed reproduce the deep-network phase transitions discovered by the authors.
+2. **Solver Order & Discretization Dynamics:** Because discrete ResNets mimic a crude 1st-order forward Euler step, we test whether Euler integration is sufficient. We show that 1st-order Euler accumulates severe numerical error along maze boundaries (our Run 2), whereas **higher-order Runge-Kutta solvers (RK4)** eliminate integration drift and unlock breakthrough performance (our Run 4).
+3. **Actor-Critic Capacity Co-Design:** We discover that making only the critic a Neural ODE creates a severe capacity mismatch against a shallow actor (our Run 1, score 0.0). We solve this by introducing a **Dual Continuous-Depth architecture**, where both Actor and Critic evolve via continuous vector fields.
+4. **Empirical Parameter Efficiency:** We prove the authors' theoretical conjecture on parameter scaling: our Dual Neural ODE matches 91% of ResNet-64 performance with **42% fewer parameters** in locomotion (`ant_u4_maze`), and beats ResNet-4 by **+67.0% with 70% fewer parameters** than ResNet-32 in manipulation (`arm_push_hard`).
 
 ---
 
